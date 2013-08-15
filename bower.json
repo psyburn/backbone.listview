@@ -1,0 +1,17 @@
+{
+  "name": "listview",
+  "version": "0.0.0",
+  "main": "backbone.listview.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "backbone": "~1.0.0",
+    "underscore": "~1.5.1",
+    "jquery": "~2.0.3"
+  }
+}

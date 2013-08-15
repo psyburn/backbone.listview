@@ -1,0 +1,16 @@
+{
+  "browser": true,
+  "scripturl": true,
+  "camelcase": true,
+  "curly": true,
+  "forin": true,
+  "jquery": true,
+  "boss": true,
+  "indent": 2,
+  "latedef": true,
+  "undef": true,
+  "unused": false,
+  "devel": false,
+  "strict": true,
+  "trailing": false
+}
