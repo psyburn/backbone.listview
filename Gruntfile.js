@@ -10,18 +10,13 @@ module.exports = function(grunt) {
 
     jshint: {
       options: {
-        jshintrc: '.jshintrc',
-        globals: {
-          define: true,
-          require: true,
-          Backbone: true,
-          _: true,
-          equal: true,
-          module: true
-        }
+        jshintrc: '.jshintrc'
       },
       gruntfile: {
         src: 'Gruntfile.js'
+      },
+      test: {
+        src: 'test/*.js'
       },
       list: {
         src: 'backbone.listview.js'

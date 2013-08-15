@@ -12,5 +12,14 @@
   "unused": false,
   "devel": false,
   "strict": true,
-  "trailing": false
+  "trailing": false, 
+  "globals": {
+    "define": true,
+    "require": true,
+    "Backbone": true,
+    "_": true,
+    "equal": true,
+    "module": true,
+    "test": true
+  }
 }
