@@ -4,6 +4,20 @@
   <meta charset="UTF-8" />
   <title>backbone.layoutmanager Test Suite</title>
   <link rel="stylesheet" href="qunit/qunit.css">
+  <style type="text/css">
+  #container {
+    display: block;
+    position: absolute;
+    height: 200px;
+    width: 400px;
+  }
+  #container div {
+    height: 50%;
+    background: red;
+    border: blue 1px solid;
+  }
+
+  </style>
   <script src="qunit/qunit.js"></script>
   <script src="vendor/jquery.js"></script>
   <script src="vendor/underscore.js"></script>
@@ -21,6 +35,6 @@
   <ol id="qunit-tests"></ol>
   <div id="qunit-fixture">test markup</div>
 
-  <div id="container" style="display:none"></div>
+  <div id="container" style=""></div>
 </body>
 </html>
