@@ -5,7 +5,6 @@
 
     constructor: function ListView(options) {
       options = options || {};
-      //if no collection is defined - setup a empty one
 
       this.setupListView(options);
       this.setupListeners();
@@ -15,14 +14,15 @@
 
     setupListView: function(options) {
       _.defaults(options, {
+        //if no itemView is defined - use backbone default 
         itemView: Backbone.View,
+        //if no collection is defined - setup a empty one
         collection: new Backbone.Collection()
       });
       this.listItems = [];
       this.itemView = options.itemView;
       this.collection = options.collection;
     },
-
     setupListeners: function() {
       this.listenTo(this.collection, 'add', this.addSingleItem, this);
       this.listenTo(this.collection, 'reset', this.addAll, this);
