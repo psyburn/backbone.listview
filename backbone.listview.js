@@ -71,10 +71,15 @@
     },
 
     //propagate list item events through parent list view
+    //propagates the single listview and any additional parameters to the listview
     addListItemListeners: function(view) {
-      this.listenTo(view, 'all', function(eventName) {
-        this.trigger('item:' + eventName);
-      }, this);
+      this.listenTo(view, 'all', function() {
+        var eventName = 'item:' + arguments[0];
+        var params = _.toArray(arguments);
+        params.splice(0,1);
+        params.unshift(eventName, view);
+        this.trigger.apply(this, params);
+      });
     },
 
     getViewByModel: function(model) {

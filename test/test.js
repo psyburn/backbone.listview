@@ -129,7 +129,7 @@
     view.on('item:click', function() {
       clickCount++;
     });
-    selectedView.trigger('click');
+    selectedView.$el.trigger('click');
     equal(clickCount, 1, 'Should be 1 click');
     testCollection.remove(model);
     equal(view.$('div').length, 1, 'Should be 1 list items.');
@@ -138,6 +138,40 @@
     clickCount = 0;
     selectedView.trigger('click');
     equal(clickCount, 0, 'Should be 0 click events after removal.');
+  });
+
+  test('Parameter passing from list to item', function() {
+    var additionalTestParam = '';
+    var expectedTestParam = 'some additional data';
+    var SingleView = Backbone.View.extend({
+      className: 'list-item',
+      events: {
+        'click': 'clickMe'
+      },
+
+      clickMe: function() {
+        this.trigger('click', expectedTestParam);
+      }
+    });
+
+    var ListView = Backbone.ListView.extend({
+      el: '<div></div>',
+      className: 'list',
+    });
+
+    var view = new ListView({
+      collection: testCollection,
+      itemView: SingleView
+    });
+
+    view.render();
+
+    view.on('item:click', function(view, aditionalParam) {
+      additionalTestParam = aditionalParam;
+    });
+    view.items[0].$el.trigger('click');
+
+    equal(additionalTestParam, expectedTestParam, 'Should pass parametar from item to list.');
   });
 
 })();
