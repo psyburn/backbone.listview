@@ -55,7 +55,7 @@ var monsterListView = new ListView({
 });
 
 monsterListView.render();
-##
+```
 
 Resulting HTML Output: 
 
