@@ -36,6 +36,11 @@
     },
 
     addAll: function() {
+      //remove previous items if present
+      this.removeAllItems();
+      //reinit all listeners
+      this.setupListeners();
+      //add new items
       this.collection.each(function(model) {
         this.addSingleItem(model);
       }, this);
@@ -47,6 +52,7 @@
       });
       this.items.push(viewItem);
       this.addListItemListeners(viewItem);
+
       viewItem.render();
       this.$el.append(viewItem.el);
       return viewItem;
@@ -86,6 +92,19 @@
       return _.find(this.items, function(item, index) {
         return item.model===model;
       });
+    },
+
+    removeAllItems: function() {
+      this.collection.each(function(model) {
+        this.removeSingleItem(model);
+      }, this);
+    },
+
+    remove: function() {
+      //do the default Backbone remove logic 
+      Backbone.View.prototype.remove.call(this, arguments);
+      //extra remove our items - one by one
+      this.removeAllItems();
     }
   });
 
