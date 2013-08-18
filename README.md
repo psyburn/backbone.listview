@@ -1,9 +1,73 @@
 ListView
 ========
 
-Provides a generic list view for Backbone.js applications
+Provides a generic list view for Backbone.js applications.
 
-## Examples
+# Installation
+
+Add backbone.listview.js script after jQuery, Underscore (or their alternatives) and Backbone.
+``` html
+<!-- dependencies -->
+<script src="lib/jquery.js"></script>
+<script src="lib/underscore.js"></script>
+<script src="lib/backbone.js"></script>
+
+<!-- listview plugin -->
+<script src="backbone.listview.js"></script>
+```
+
+# Usage
+```js
+var ListView = Backbone.ListView.extend({});
+var list = new ListView({
+  collection: someCollection,
+  itemView: SomeView
+});
+```
+
+The listview is a just an modifeid view that renders a list a collecton based on a single view. Any standard options for a view can be passed to the listview (model, collection, el, id, className, tagName and attributes).
+
+Note that the passed collection will be used for the list view operations.
+
+Another needed options is needed is the itemView.
+
+## itemView 
+
+The itemView is the view definition that will be rendered into the list. The list item is made using the itemView definition and the corresponding model from the collection.
+
+```js
+//define the itemView
+var MonsterItemView = Backbone.View.extend({
+  className: 'list-item',
+  render: function() {
+    this.$el.html('Name: ' + this.model.get('name'));
+  }
+});
+
+var monsterCollection = new Backbone.Collection([{name: 'Dracula'}, {name: 'Edward'}]);
+
+var ListView = Backbone.ListView.extend({});
+//create a list using the defined item view and collection
+var monsterListView = new ListView({
+  className: 'monster-list',
+  collection: monsterCollection,
+  itemView: MonsterItemView
+});
+
+monsterListView.render();
+##
+
+Resulting HTML Output: 
+
+``` html
+<div class="monster-list">
+  <div class="list-item">Name: Dracula</div>
+  <div class="list-item">Name: Edward</div>
+</div>
+```
+
+
+# Examples
 
 ### JSFiddle
 [Choose your Pokemon](http://jsfiddle.net/PsyBurn/dkphn/)
