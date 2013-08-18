@@ -67,6 +67,38 @@ Resulting HTML Output:
 ```
 
 
+## Item events
+
+Any event triggered on the item will also be triggered on the list - but namespaced with 'item:'.
+Following the previous example and slightly changing the item view with a click listener:
+
+```js
+var MonsterItemView = Backbone.View.extend({
+  className: 'list-item',
+  render: function() {
+    this.$el.html('Name: ' + this.model.get('name'));
+  },
+  events: {
+    'click': 'onItemClick'
+  },
+  onItemClick: function() {
+    this.trigger('click', 'I have clicked on a monster named:');
+  }
+});
+```
+
+We can listen for that event on the list by attaching an 'item:click' listener. Any arguments 
+
+```js
+monsterListView.on('item:click', function(view, argument) {
+  alert(argument + view.model.get('name'));
+});
+```
+
+Clicking on the first item would yield in a alert "I have clicked on a monster named: Dracula"
+
+
+
 # Examples
 
 ### JSFiddle
