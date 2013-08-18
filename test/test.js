@@ -1,6 +1,21 @@
 (function() {
   'use strict';
   var TestView;
+  var SingleView = Backbone.View.extend({
+    className: 'list-item',
+    events: {
+      'click': 'clickMe'
+    },
+
+    clickMe: function() {
+      this.trigger('click');
+    }
+  });
+  var ListView = Backbone.ListView.extend({
+    el: '<div></div>',
+    className: 'list'
+  });
+
   var testCollection = new Backbone.Collection([{id: 1, name: 'duck'}, {id: 2, name: 'dog'}]);
 
   module('Backbone.View', {
@@ -24,10 +39,6 @@
   });
 
   test('Render collection', function() {
-    var ListView = Backbone.ListView.extend({
-      el: '<div></div>',
-      className: 'list'
-    });
     var view = new ListView({
       collection: testCollection
     });
@@ -38,21 +49,6 @@
 
   test('Test event clicks on items', function() {
     var clickCount = 0;
-    var SingleView = Backbone.View.extend({
-      className: 'list-item',
-      events: {
-        'click': 'clickMe'
-      },
-
-      clickMe: function() {
-        this.trigger('click');
-      }
-    });
-
-    var ListView = Backbone.ListView.extend({
-      el: '<div></div>',
-      className: 'list',
-    });
 
     var view = new ListView({
       collection: testCollection,
@@ -70,22 +66,6 @@
   });
 
   test('Add list item', function() {
-    var SingleView = Backbone.View.extend({
-      className: 'list-item',
-      events: {
-        'click': 'clickMe'
-      },
-
-      clickMe: function() {
-        this.trigger('click');
-      }
-    });
-
-    var ListView = Backbone.ListView.extend({
-      el: '<div></div>',
-      className: 'list',
-    });
-
     var view = new ListView({
       collection: testCollection,
       itemView: SingleView
@@ -102,21 +82,6 @@
   test('Remove item from collection', function() {
     var clickCount = 0;
     var testCollection = new Backbone.Collection([{id: 1, name: 'duck'}, {id: 2, name: 'dog'}]);
-    var SingleView = Backbone.View.extend({
-      className: 'list-item',
-      events: {
-        'click': 'clickMe'
-      },
-
-      clickMe: function() {
-        this.trigger('click');
-      }
-    });
-
-    var ListView = Backbone.ListView.extend({
-      el: '<div></div>',
-      className: 'list',
-    });
 
     var view = new ListView({
       collection: testCollection,
@@ -152,11 +117,6 @@
       clickMe: function() {
         this.trigger('click', expectedTestParam);
       }
-    });
-
-    var ListView = Backbone.ListView.extend({
-      el: '<div></div>',
-      className: 'list',
     });
 
     var view = new ListView({
