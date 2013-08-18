@@ -3,7 +3,15 @@ ListView
 
 Provides a generic list view for Backbone.js applications
 
-## Example
+## Examples
+
+### JSFiddle
+[Choose your Pokemon](http://jsfiddle.net/PsyBurn/dkphn/)
+
+[Shopping list](http://jsfiddle.net/PsyBurn/2nsu5/2/)
+
+
+### Quick example
 
 ```js
 var nameCollection = new Backbone.Collection([
