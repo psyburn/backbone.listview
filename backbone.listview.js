@@ -69,6 +69,7 @@
       this.stopListening(view);
 
       if (view) {
+        this.stopListening(view.model);
         view.remove();
         index = this.items.indexOf(view);
         //remove view from items
@@ -85,6 +86,10 @@
         params.splice(0,1);
         params.unshift(eventName, view);
         this.trigger.apply(this, params);
+      });
+
+      this.listenTo(view.model, 'change', function() {
+        view.render();
       });
     },
 
