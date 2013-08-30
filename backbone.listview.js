@@ -1,108 +1,114 @@
 (function() {
   'use strict';
-  var List = Backbone.View.extend({
-    className: 'list',
+  var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
+  var List = Backbone.View.extend({
     constructor: function ListView(options) {
       options = options || {};
-
       this.setupListView(options);
       this.setupListeners();
+      this.createItemWrapper();
+      this.setupListItemListeners();
       //super call - default Backbone magic
       Backbone.View.call(this, options);
     },
 
     setupListView: function(options) {
       _.defaults(options, {
-        //if no itemView is defined - use backbone default 
-        itemView: Backbone.View,
+        itemEl: 'div',
+        itemClassName: 'list-item',
+        itemTemplate: _.template(''),
         //if no collection is defined - setup a empty one
         collection: new Backbone.Collection()
       });
-      this.items = [];
-      this.itemView = options.itemView;
-      this.collection = options.collection;
+      this.items = {};
+      this.itemTemplate = this.itemTemplate || options.itemTemplate;
+      this.collection = this.collection || options.collection;
+      this.itemEl = this.itemEl || options.itemEl;
+      this.itemClassName = this.itemClassName || options.itemClassName;
     },
 
     setupListeners: function() {
       this.listenTo(this.collection, 'add', this.addSingleItem, this);
-      this.listenTo(this.collection, 'reset', this.addAll, this);
+      this.listenTo(this.collection, 'reset', this.addAllItems, this);
       this.listenTo(this.collection, 'remove', this.removeSingleItem, this);
     },
 
+    setupListItemListeners: function() {
+      var newItemEvents = {};
+      for (var key in this.itemEvents) {
+        var method = this.itemEvents[key];
+        if (!_.isFunction(method)) {
+          method = this[this.itemEvents[key]];
+        }
+        if (!method) {
+          continue;
+        }
+
+        var match = key.match(delegateEventSplitter);
+        var eventName = match[1], selector = match[2];
+        var newMethod = method;
+        var me = this;
+        method = function() {
+          var args = _.toArray(arguments);
+          if (args.length && args[0].target) {
+            args.unshift($(args[0].target).data('model'));
+          }
+          newMethod.apply(me, args);
+        }
+
+        newItemEvents[eventName + ' .' + this.itemClassName +' '+ selector] = method;
+      }
+
+      this.events = this.events || {};
+      _.extend(this.events, newItemEvents);
+    },
+
     render: function() {
-      this.addAll();
+      this.addAllItems();
       return this;
     },
 
-    addAll: function() {
-      //remove previous items if present
+    addAllItems: function() {
       this.removeAllItems();
-      //reinit all listeners
-      this.setupListeners();
       //add new items
       this.collection.each(function(model) {
         this.addSingleItem(model);
       }, this);
     },
 
+    createItemWrapper: function() {
+      var itemWrapper = document.createElement(this.itemEl);
+      itemWrapper.className = this.itemClassName;
+      this.itemWrapper = itemWrapper;
+    },
+
+    renderSingleItem: function(model) {
+      return this.itemTemplate(model.toJSON());
+    },
+
     addSingleItem: function(model) {
-      var viewItem = new this.itemView({
-        model: model
-      });
-      this.items.push(viewItem);
-      this.addListItemListeners(viewItem);
-
-      viewItem.render();
-      this.$el.append(viewItem.el);
-      return viewItem;
-    },
-
-    removeSingleItem: function(model) {
-      var view = this.getViewByModel(model);
-      this.removeSingleView(view);
-    },
-
-    removeSingleView: function(view) {
-      var index;
-      //remove listeners
-      this.stopListening(view);
-
-      if (view) {
-        this.stopListening(view.model);
-        view.remove();
-        index = this.items.indexOf(view);
-        //remove view from items
-        this.items.splice(index, 1);
-      }
-    },
-
-    //propagate list item events through parent list view
-    //propagates the single listview and any additional parameters to the listview
-    addListItemListeners: function(view) {
-      this.listenTo(view, 'all', function() {
-        var eventName = 'item:' + arguments[0];
-        var params = _.toArray(arguments);
-        params.splice(0,1);
-        params.unshift(eventName, view);
-        this.trigger.apply(this, params);
-      });
-
-      this.listenTo(view.model, 'change', function() {
-        view.render();
-      });
+      var outputHTML = this.itemWrapper.cloneNode();
+      outputHTML.innerHTML = this.renderSingleItem(model);
+      $(outputHTML).data('model', model);
+      this.$el.append(outputHTML);
+      this.items[model.cid] = $(outputHTML);
     },
 
     getViewByModel: function(model) {
-      return _.find(this.items, function(item, index) {
-        return item.model===model;
-      });
+      return this.items[model.cid];
+    },
+
+    removeSingleItem: function(model) {
+      if (this.items && this.items[model.cid]) {
+        this.items[model.cid].remove();
+        delete this.items[model.cid];
+      }
     },
 
     removeAllItems: function() {
-      this.collection.each(function(model) {
-        this.removeSingleItem(model);
-      }, this);
+      this.$el.empty();
+      this.items = {};
     },
 
     remove: function() {

@@ -1,19 +1,16 @@
 (function() {
   'use strict';
   var TestView;
-  var SingleView = Backbone.View.extend({
-    className: 'list-item',
-    events: {
-      'click': 'clickMe'
-    },
-
-    clickMe: function() {
-      this.trigger('click');
-    }
-  });
   var ListView = Backbone.ListView.extend({
     el: '<div></div>',
-    className: 'list'
+    className: 'list',
+    itemEvents: {
+      'click': 'onClick'
+    },
+
+    onClick: function(model, e) {
+      this.trigger('item:click', model, e);
+    }
   });
 
   var testCollection = new Backbone.Collection([{id: 1, name: 'Charizard'}, {id: 2, name: 'Alakazam'}]);
@@ -51,8 +48,7 @@
     var clickCount = 0;
 
     var view = new ListView({
-      collection: testCollection,
-      itemView: SingleView
+      collection: testCollection
     });
 
     view.render();
@@ -60,15 +56,14 @@
       clickCount++;
     });
 
-    view.items[0].trigger('click').trigger('click');
+    $(view.$el.find('div')[1]).trigger('click').trigger('click');
 
     equal(clickCount, 2, 'Should be 2 clicks.');
   });
 
   test('Add list item', function() {
     var view = new ListView({
-      collection: testCollection,
-      itemView: SingleView
+      collection: testCollection
     });
 
     view.render();
@@ -84,8 +79,7 @@
     var testCollection = new Backbone.Collection([{id: 1, name: 'Charizard'}, {id: 2, name: 'Alakazam'}]);
 
     var view = new ListView({
-      collection: testCollection,
-      itemView: SingleView
+      collection: testCollection
     });
 
     view.render();
@@ -94,11 +88,11 @@
     view.on('item:click', function() {
       clickCount++;
     });
-    selectedView.$el.trigger('click');
+    selectedView.trigger('click');
     equal(clickCount, 1, 'Should be 1 click');
     testCollection.remove(model);
     equal(view.$('div').length, 1, 'Should be 1 list items.');
-    equal(view.items.length, 1, 'There should be 1 item in view items.');
+    equal(_.size(view.items), 1, 'There should be 1 item in view items.');
 
     clickCount = 0;
     selectedView.trigger('click');
@@ -108,29 +102,29 @@
   test('Parameter passing from list to item', function() {
     var additionalTestParam = '';
     var expectedTestParam = 'some additional data';
-    var SingleView = Backbone.View.extend({
-      className: 'list-item',
-      events: {
-        'click': 'clickMe'
+
+    var ListView = Backbone.ListView.extend({
+      el: '<div></div>',
+      className: 'list',
+      itemEvents: {
+        'click': 'onClick'
       },
 
-      clickMe: function() {
-        this.trigger('click', expectedTestParam);
+      onClick: function(model, e) {
+        this.trigger('item:click', model, e, expectedTestParam);
       }
     });
 
     var view = new ListView({
-      collection: testCollection,
-      itemView: SingleView
+      collection: testCollection
     });
 
     view.render();
 
-    view.on('item:click', function(view, aditionalParam) {
+    view.on('item:click', function(model, e, aditionalParam) {
       additionalTestParam = aditionalParam;
     });
-    view.items[0].$el.trigger('click');
-
+    view.getViewByModel(testCollection.at(0)).trigger('click');
     equal(additionalTestParam, expectedTestParam, 'Should pass parametar from item to list.');
   });
 
@@ -139,8 +133,7 @@
     var clickCount = 0;
 
     var view = new ListView({
-      collection: testCollection,
-      itemView: SingleView
+      collection: testCollection
     });
 
     view.render();
@@ -159,16 +152,26 @@
     view.on('item:click', function() {
       clickCount++;
     });
-    view.items[0].$el.trigger('click');    
+    var model = testCollection.at(0);
+    var selectedView = view.getViewByModel(model);
+    selectedView.trigger('click');
     equal(clickCount, 1, 'Check listeners after rerender');
 
     clickCount = 0;
     testCollection.trigger('reset');
 
-    view.items[0].$el.trigger('click');    
+    selectedView.trigger('click');
+    equal(clickCount, 0, 'Check listeners after collection fetch');
+
+    selectedView = view.getViewByModel(model);
+    selectedView.trigger('click');
+
     equal(clickCount, 1, 'Check listeners after collection fetch');
     equal(view.$('div').length, 3, 'After rerender: Should be 3 list items in DOM.');
 
+    view.remove();
+    equal(view.$('div').length, 0, 'After list remove: Should be 0 list items in DOM.');
+    equal(_.size(view.items), 0, 'After list remove: Should be 0  items in list.');
 
   });
 
